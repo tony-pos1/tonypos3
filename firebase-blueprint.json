@@ -1,0 +1,396 @@
+{
+  "entities": {
+    "ShopSettings": {
+      "title": "ShopSettings",
+      "description": "Store configuration such as VAT, service charge, and restaurant name",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "restaurantName": { "type": "string", "maxLength": 100 },
+        "vatPercent": { "type": "number" },
+        "serviceChargePercent": { "type": "number" },
+        "dailyClosingTime": { "type": "string", "maxLength": 10 },
+        "targetFoodCostPercent": { "type": "number" },
+        "uploadedQrImage": { "type": "string", "maxLength": 500000 },
+        "currencySymbol": { "type": "string", "maxLength": 10 },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "restaurantName", "vatPercent", "serviceChargePercent", "version"]
+    },
+    "Ingredient": {
+      "title": "Ingredient",
+      "description": "Raw material ingredient with yield and base unit pricing",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nameTh": { "type": "string", "maxLength": 100 },
+        "nameEn": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "purchaseUnit": { "type": "string", "maxLength": 30 },
+        "purchaseQuantity": { "type": "number" },
+        "purchasePrice": { "type": "number" },
+        "yieldPercent": { "type": "number" },
+        "baseUnit": { "type": "string", "enum": ["g", "ml", "piece"] },
+        "costPerBaseUnit": { "type": "number" },
+        "priceHistory": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "nameTh", "purchasePrice", "purchaseQuantity", "yieldPercent", "baseUnit", "version"]
+    },
+    "SubRecipe": {
+      "title": "SubRecipe",
+      "description": "Prepared batch recipe or sauce with yield loss/gain",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nameTh": { "type": "string", "maxLength": 100 },
+        "nameEn": { "type": "string", "maxLength": 100 },
+        "recipeLines": { "type": "array" },
+        "batchQuantity": { "type": "number" },
+        "yieldPercent": { "type": "number" },
+        "outputUnit": { "type": "string", "maxLength": 30 },
+        "costPerOutputUnit": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "nameTh", "batchQuantity", "yieldPercent", "outputUnit", "version"]
+    },
+    "PackagingItem": {
+      "title": "PackagingItem",
+      "description": "Takeaway container, box, cup, bag or cutlery",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "unitCost": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "name", "unitCost", "version"]
+    },
+    "Dish": {
+      "title": "Dish",
+      "description": "Menu dish item without stored food cost (calculated dynamically)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nameTh": { "type": "string", "maxLength": 100 },
+        "nameEn": { "type": "string", "maxLength": 100 },
+        "categoryId": { "type": "string" },
+        "photo": { "type": "string", "maxLength": 500000 },
+        "active": { "type": "boolean" },
+        "variants": { "type": "array" },
+        "optionGroupIds": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "nameTh", "categoryId", "active", "variants", "version"]
+    },
+    "OptionGroup": {
+      "title": "OptionGroup",
+      "description": "Reusable option modifiers with optional cost lines and price delta",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nameTh": { "type": "string", "maxLength": 100 },
+        "nameEn": { "type": "string", "maxLength": 100 },
+        "required": { "type": "boolean" },
+        "minChoices": { "type": "number" },
+        "maxChoices": { "type": "number" },
+        "choices": { "type": "array" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "nameTh", "choices", "order", "version"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Menu category classification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nameTh": { "type": "string", "maxLength": 100 },
+        "nameEn": { "type": "string", "maxLength": 100 },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "nameTh", "order", "version"]
+    },
+    "SalesChannel": {
+      "title": "SalesChannel",
+      "description": "Ordering channels including delivery platforms with commission and fees",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "name": { "type": "string", "maxLength": 50 },
+        "commissionPercent": { "type": "number" },
+        "paymentFeePercent": { "type": "number" },
+        "vatOnCommissionPercent": { "type": "number" },
+        "packagingChargedToCustomer": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "name", "commissionPercent", "paymentFeePercent", "version"]
+    },
+    "Table": {
+      "title": "Table",
+      "description": "Dining table and floorplan position",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "number": { "type": "string", "maxLength": 20 },
+        "zoneId": { "type": "string" },
+        "tableType": { "type": "string", "enum": ["square", "rect", "round", "bar"] },
+        "chairs": { "type": "number" },
+        "positionX": { "type": "number" },
+        "positionY": { "type": "number" },
+        "status": { "type": "string", "enum": ["available", "occupied", "reserved"] },
+        "currentBillId": { "type": "string" },
+        "currentBillNumber": { "type": "string" },
+        "occupiedAt": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "number", "zoneId", "status", "version"]
+    },
+    "Zone": {
+      "title": "Zone",
+      "description": "Dining area or floor zone",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 50 },
+        "color": { "type": "string", "maxLength": 20 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "name", "version"]
+    },
+    "Bill": {
+      "title": "Bill",
+      "description": "POS order bill with immutable cost snapshots at sale time",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "billNumber": { "type": "string", "maxLength": 30 },
+        "channelId": { "type": "string" },
+        "tableId": { "type": "string" },
+        "tableName": { "type": "string" },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "serviceChargePercent": { "type": "number" },
+        "serviceChargeAmount": { "type": "number" },
+        "vatPercent": { "type": "number" },
+        "vatAmount": { "type": "number" },
+        "total": { "type": "number" },
+        "totalFoodCost": { "type": "number" },
+        "payments": { "type": "array" },
+        "status": { "type": "string", "enum": ["open", "paid", "voided"] },
+        "guestCount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "paidAt": { "type": "string" },
+        "voidedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "billNumber", "channelId", "items", "status", "version"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Operating or inventory expense record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "maxLength": 20 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "category", "title", "amount", "date", "version"]
+    },
+    "Employee": {
+      "title": "Employee",
+      "description": "Staff profile and wage structure",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "maxLength": 50 },
+        "wageType": { "type": "string", "enum": ["hourly", "monthly"] },
+        "wageRate": { "type": "number" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "name", "role", "wageRate", "version"]
+    },
+    "Shift": {
+      "title": "Shift",
+      "description": "Working shift and cash register drawer float",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "cashFloatStart": { "type": "number" },
+        "cashFloatEnd": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "employeeId", "startTime", "cashFloatStart", "version"]
+    },
+    "Member": {
+      "title": "Member",
+      "description": "Loyalty customer member record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "points": { "type": "number" },
+        "tier": { "type": "string", "maxLength": 30 },
+        "totalSpent": { "type": "number" },
+        "visitCount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "name", "phone", "version"]
+    },
+    "DailySummary": {
+      "title": "DailySummary",
+      "description": "Aggregated end-of-day sales and food cost financial summary",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string", "maxLength": 20 },
+        "totalSales": { "type": "number" },
+        "netSales": { "type": "number" },
+        "totalBills": { "type": "number" },
+        "paidBills": { "type": "number" },
+        "voidedBills": { "type": "number" },
+        "totalFoodCost": { "type": "number" },
+        "grossProfit": { "type": "number" },
+        "totalDiscounts": { "type": "number" },
+        "totalVat": { "type": "number" },
+        "totalServiceCharge": { "type": "number" },
+        "channelBreakdown": { "type": "object" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "date", "totalSales", "netSales", "version"]
+    },
+    "BillCounter": {
+      "title": "BillCounter",
+      "description": "Sequential atomic bill counter for concurrency protection",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "lastNumber": { "type": "number" },
+        "updatedAt": { "type": "string" },
+        "version": { "type": "number" }
+      },
+      "required": ["id", "lastNumber", "version"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/settings/{settingId}": {
+      "schema": "ShopSettings",
+      "description": "Restaurant shop configuration document"
+    },
+    "/users/{userId}/ingredients/{ingredientId}": {
+      "schema": "Ingredient",
+      "description": "Inventory ingredients"
+    },
+    "/users/{userId}/subRecipes/{subRecipeId}": {
+      "schema": "SubRecipe",
+      "description": "Intermediate sauces and prep recipes"
+    },
+    "/users/{userId}/packaging/{packagingId}": {
+      "schema": "PackagingItem",
+      "description": "Packaging containers and disposables"
+    },
+    "/users/{userId}/dishes/{dishId}": {
+      "schema": "Dish",
+      "description": "Menu dishes and variants"
+    },
+    "/users/{userId}/optionGroups/{groupId}": {
+      "schema": "OptionGroup",
+      "description": "Reusable option modifier groups"
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Dish categories"
+    },
+    "/users/{userId}/channels/{channelId}": {
+      "schema": "SalesChannel",
+      "description": "POS and delivery sales channels"
+    },
+    "/users/{userId}/tables/{tableId}": {
+      "schema": "Table",
+      "description": "Floor plan tables"
+    },
+    "/users/{userId}/zones/{zoneId}": {
+      "schema": "Zone",
+      "description": "Dining floor zones"
+    },
+    "/users/{userId}/bills/{billId}": {
+      "schema": "Bill",
+      "description": "POS orders and historical bills with snapshot costs"
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Expenses tracking"
+    },
+    "/users/{userId}/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Staff roster"
+    },
+    "/users/{userId}/shifts/{shiftId}": {
+      "schema": "Shift",
+      "description": "Cash shifts and work hours"
+    },
+    "/users/{userId}/members/{memberId}": {
+      "schema": "Member",
+      "description": "Loyalty program members"
+    },
+    "/users/{userId}/images/{imageId}": {
+      "schema": { "$ref": "Image" },
+      "description": "Compressed menu photo storage"
+    },
+    "/users/{userId}/dailySummaries/{summaryDate}": {
+      "schema": "DailySummary",
+      "description": "Daily closed financial figures"
+    },
+    "/users/{userId}/counters/{counterId}": {
+      "schema": "BillCounter",
+      "description": "Atomic bill sequence counters"
+    }
+  }
+}

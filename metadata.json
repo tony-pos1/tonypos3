@@ -1,0 +1,6 @@
+{
+  "name": "KinD - Restaurant POS & Food Cost",
+  "description": "All-in-one restaurant POS and precision Food Cost system with live calculation engine, recipe management, and sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,167 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function hasValidVersionOnUpdate() {
+      // Optimistic concurrency control: incoming version must match existing + 1 or incoming must specify valid version
+      return incoming().version is number && incoming().version >= existing().version;
+    }
+
+    // User-isolated workspace: users/{userId}/**
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Settings subcollection
+      match /settings/{settingId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(settingId);
+        allow delete: if false; // Cannot delete shop settings
+      }
+
+      // Ingredients subcollection
+      match /ingredients/{ingredientId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(ingredientId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(ingredientId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Sub-recipes subcollection
+      match /subRecipes/{subRecipeId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(subRecipeId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(subRecipeId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Packaging subcollection
+      match /packaging/{packagingId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(packagingId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(packagingId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Dishes subcollection
+      match /dishes/{dishId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(dishId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(dishId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Option groups subcollection
+      match /optionGroups/{groupId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(groupId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(groupId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Categories subcollection
+      match /categories/{categoryId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(categoryId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(categoryId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Sales channels subcollection
+      match /channels/{channelId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(channelId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(channelId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Tables subcollection
+      match /tables/{tableId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(tableId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(tableId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Zones subcollection
+      match /zones/{zoneId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(zoneId) && incoming().version is number;
+        allow update: if isOwner(userId) && isValidId(zoneId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Bills subcollection (POS orders with immutable cost snapshots)
+      match /bills/{billId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(billId) && incoming().version is number;
+        // Updating bill (e.g. adding item, completing payment, voiding) must respect version
+        allow update: if isOwner(userId) && isValidId(billId) && hasValidVersionOnUpdate();
+        allow delete: if isOwner(userId);
+      }
+
+      // Expenses subcollection
+      match /expenses/{expenseId} {
+        allow read: if isOwner(userId);
+        allow create, update, delete: if isOwner(userId) && isValidId(expenseId);
+      }
+
+      // Employees subcollection
+      match /employees/{employeeId} {
+        allow read, write: if isOwner(userId) && isValidId(employeeId);
+      }
+
+      // Shifts subcollection
+      match /shifts/{shiftId} {
+        allow read, write: if isOwner(userId) && isValidId(shiftId);
+      }
+
+      // Members subcollection
+      match /members/{memberId} {
+        allow read, write: if isOwner(userId) && isValidId(memberId);
+      }
+
+      // Images subcollection (compressed photo storage)
+      match /images/{imageId} {
+        allow read, write: if isOwner(userId) && isValidId(imageId);
+      }
+
+      // Daily summaries: dailySummaries/{YYYY-MM-DD}
+      match /dailySummaries/{summaryDate} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(summaryDate);
+        allow delete: if false; // Audit trail preservation
+      }
+
+      // Counters (atomic bill counter)
+      match /counters/{counterId} {
+        allow read, write: if isOwner(userId) && isValidId(counterId);
+      }
+    }
+  }
+}
